@@ -2,7 +2,7 @@
 
 **⚠️ WARNING: Personal Use Only - Experimental Software ⚠️**
 
-This is a personal study-facilitation application designed for my own workflow. It is highly experimental, contains **tons of bugs, problems, and unfinished features**. Use it at your own risk. This project is not intended for production use or as a polished consumer product.
+This is a personal study-facilitation application designed and vibecoded for my own workflow. It is highly experimental, contains **tons of bugs, problems, and unfinished features**. Use it at your own risk. This project is not intended for production use or as a polished consumer product.
 
 ## Overview
 
@@ -54,7 +54,7 @@ python main.py
 - `Enter`: Send message (within the text area).
 - `q`: Quit.
 
-## Known Issues (The "Tons of Bugs" List)
+## Known Issues 
 - File paths with spaces might cause issues in some components.
 - Large PDF extraction can be slow and might block the UI occasionally.
 - Layout may break on very small terminal windows.
@@ -62,4 +62,4 @@ python main.py
 - **And many more...**
 
 ## License
-Personal use only. No warranty of any kind.
+Do whatever you want
