@@ -17,6 +17,7 @@ CONFIG_PATH = os.path.join(ROOT_DIR, "chat_config.json")
 DEFAULT_CONFIG = {
     "base_directory": DEFAULT_BASE_DIRECTORY,
     "show_md_files": False,
+    "show_hidden_files": False,
     "model": {
         "think": "deepseek-reasoner",
         "chat": "deepseek-chat"
@@ -44,6 +45,7 @@ def save_config(config_data):
 base_directory = DEFAULT_BASE_DIRECTORY
 attachment_root = DEFAULT_ATTACHMENT_ROOT
 show_md_files = False
+show_hidden_files = False
 model = "deepseek-chat"
 presets = []
 
@@ -57,6 +59,7 @@ try:
             if isinstance(cfg, dict):
                 base_directory = cfg.get("base_directory", base_directory)
                 show_md_files = cfg.get("show_md_files", show_md_files)
+                show_hidden_files = cfg.get("show_hidden_files", show_hidden_files)
                 model = cfg.get("model", model)
                 # Supporting both keys for backward compatibility or just fixing it
                 attachment_root = cfg.get("attachment_root_directory", cfg.get("chat_attachment_root", attachment_root))
@@ -68,6 +71,7 @@ except Exception:
 # Allow environment var override
 BASE_DIRECTORY = os.getenv("CHAT_BASE_DIRECTORY", base_directory)
 SHOW_MD_FILES = os.getenv("CHAT_SHOW_MD_FILES", str(show_md_files)).lower() in ("true", "1", "yes")
+SHOW_HIDDEN_FILES = os.getenv("CHAT_SHOW_HIDDEN_FILES", str(show_hidden_files)).lower() in ("true", "1", "yes")
 MODEL = os.getenv("CHAT_MODEL", model)
 ATTACHMENT_ROOT_DIRECTORY = os.getenv("CHAT_ATTACHMENT_ROOT", attachment_root)
 PRESETS = presets

@@ -19,6 +19,7 @@ from textual.reactive import reactive
 from textual import on, work
 from textual.screen import ModalScreen
 from textual.message import Message
+from typing import Iterable
 from rich.text import Text
 import os
 import sys
@@ -30,6 +31,7 @@ from backend.config import (
     BASE_DIRECTORY,
     MODEL,
     SHOW_MD_FILES,
+    SHOW_HIDDEN_FILES,
     ATTACHMENT_ROOT_DIRECTORY,
     PRESETS,
 )
@@ -45,6 +47,26 @@ from backend.llm_engine import generate_response
 
 load_dotenv()
 
+class FilteredDirectoryTree(DirectoryTree):
+    def filter_hidden(self, paths: Iterable[Path]) -> Iterable[Path]:
+        if SHOW_HIDDEN_FILES:
+            return paths
+        filtered = [path for path in paths if not path.name.startswith(".")]
+        with open('debug.log', 'a') as f:
+            f.write(f"Original paths: {[p.name for p in paths]}\n")
+            f.write(f"Filtered hidden: {[p.name for p in filtered]}\n")
+        return filtered
+    
+    def filter_md_files(self, paths: Iterable[Path]) -> Iterable[Path]:
+        if SHOW_MD_FILES:
+            return paths
+        filtered = [path for path in paths if not path.name.endswith(".md")]
+        return filtered
+
+    def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
+        paths = self.filter_hidden(paths)
+        paths = self.filter_md_files(paths)
+        return paths
 
 class FileSelectorModal(ModalScreen[Path | None]):
     """A modal screen for selecting a file from the system."""
@@ -52,17 +74,19 @@ class FileSelectorModal(ModalScreen[Path | None]):
     _selected_path: Path | None = None
 
     def compose(self) -> ComposeResult:
+        print("Composing FileSelectorModal")
         with Vertical(id="modal-container"):
             yield Label("SELECT FILE TO ATTACH", classes="modal-title")
             root_dir = os.path.expanduser(ATTACHMENT_ROOT_DIRECTORY)
-            yield DirectoryTree(root_dir, id="modal-file-tree")
+            print(f"Root dir: {root_dir}")
+            yield FilteredDirectoryTree(root_dir, id="modal-file-tree")
             yield Label("No file selected", id="modal-selected-path")
             with Horizontal(id="modal-buttons"):
                 yield Button("Select", variant="success", id="btn-modal-select")
                 yield Button("Cancel", variant="error", id="btn-modal-cancel")
 
-    @on(DirectoryTree.FileSelected)
-    def handle_file_selection(self, event: DirectoryTree.FileSelected) -> None:
+    @on(FilteredDirectoryTree.FileSelected)
+    def handle_file_selection(self, event: FilteredDirectoryTree.FileSelected) -> None:
         self._selected_path = event.path
         self.query_one("#modal-selected-path").update(
             f"Selected: [bold]{event.path}[/bold]"
@@ -110,7 +134,7 @@ class PresetSelectorModal(ModalScreen[str | None]):
         self.dismiss(None)
 
 
-class SessionDirectoryTree(DirectoryTree):
+class SessionDirectoryTree(FilteredDirectoryTree):
     def render_label(self, node, base_style, control_style):
         node_label = node.label.copy()
         node_label.stylize(base_style)
@@ -121,8 +145,9 @@ class SessionDirectoryTree(DirectoryTree):
             return Text("📁 ") + node_label
         return Text("📄 ") + node_label
 
-    def filter_paths(self, paths: list[str]) -> list[str]:
-        return [path for path in paths if not os.path.basename(path) == ".session"]
+    def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
+        paths = super().filter_paths(paths)
+        return [path for path in paths if path.name != ".session"]
 
 
 class ChatMessage(Vertical):
@@ -217,7 +242,7 @@ class StudyeApp(App):
     }
 
     #latest-response-container {
-        height: 19;
+        height: 60%;
         border: thick $accent;
         padding: 0;
         background: $boost;
@@ -444,12 +469,12 @@ class StudyeApp(App):
         yield Footer()
 
     async def on_directory_tree_directory_selected(
-        self, event: DirectoryTree.DirectorySelected
+        self, event: FilteredDirectoryTree.DirectorySelected
     ) -> None:
         self.select_session(str(event.path))
 
     async def on_directory_tree_file_selected(
-        self, event: DirectoryTree.FileSelected
+        self, event: FilteredDirectoryTree.FileSelected
     ) -> None:
         path = str(event.path)
         parent_dir = os.path.dirname(path)
