@@ -8,6 +8,12 @@ This is a personal study-facilitation application designed and vibecoded for my 
 
 Studye is a TUI (Terminal User Interface) application built with Python and Textual, designed to help organize study sessions and interact with LLMs (specifically DeepSeek/OpenAI) using local documents as context.
 
+### Project Structure
+- `main.py`: Entry point for the application.
+- `frontend/`: UI components, widgets, modals, and styles.
+- `backend/`: Logic for LLM interaction, session management, and file processing.
+- `docu/`: Detailed technical documentation.
+
 ### Key Features
 - **Session-Based Organization**: Group your learning by topics or sessions.
 - **Document Context**: Attach `.txt`, `.py`, `.pdf`, or `.docx` files to your queries.

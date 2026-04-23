@@ -4,13 +4,16 @@ The frontend of Studye is built using the **Textual** TUI (Terminal User Interfa
 
 ## UI Architecture
 
-The interface is divided into two main areas:
-1.  **Sidebar**: Session management, folder navigation, and quick action buttons.
-2.  **Main Area**: Chat history display, model selection, and the message input area.
+The frontend is organized into several modules for better maintainability:
 
-## Components
+1.  **`frontend/app.py`**: The main application controller.
+2.  **`frontend/widgets.py`**: Custom TUI widgets and components.
+3.  **`frontend/modals.py`**: Modal screens for user interaction.
+4.  **`frontend/styles.tcss`**: Externalized styling (CSS-like) for the interface.
 
-### 1. `StudyeApp` (Main Application)
+## UI Components
+
+### 1. `StudyeApp` (`frontend/app.py`)
 The central controller that manages the UI state and orchestrates communication between the backend and the interface.
 - **Key Bindings**:
   - `q`: Quit
@@ -19,16 +22,14 @@ The central controller that manages the UI state and orchestrates communication 
   - `t`: Temporary Chat
   - `a`: Attach File
   - `p`: Select Preset
-  - `c`: Clear/Refresh Chat
+- **Styling**: Loads styles from `frontend/styles.tcss`.
 
-### 2. `SessionDirectoryTree`
-A customized directory tree that identifies session directories (marked with 💬) versus regular folders (📁). 
-- **Interaction**: Clicking a session directory loads its chat history. Clicking an individual `.md` file previews its content in the "Latest Response" panel.
+### 2. Custom Widgets (`frontend/widgets.py`)
+- **`SessionDirectoryTree`**: A customized directory tree that identifies session directories (marked with 💬) versus regular folders (📁).
+- **`ChatMessage`**: A custom widget for displaying individual messages using Markdown rendering.
+- **`FilteredDirectoryTree`**: Base class for trees that filters hidden files and system markers.
 
-### 3. `ChatMessage`
-A custom widget for displaying individual messages. It uses the `Markdown` widget to render rich text, including code blocks and formatting.
-
-### 4. Modals
+### 3. Modals (`frontend/modals.py`)
 - **`FileSelectorModal`**: A system-wide file picker for selecting attachments.
 - **`PresetSelectorModal`**: A list of pre-configured prompts for rapid interaction.
 
@@ -41,9 +42,4 @@ The app uses Textual's **Reactive** properties to manage dynamic UI updates:
 
 ## Concurrency
 
-Long-running tasks like LLM response generation are handled using Textual's `@work` decorator and background threads. This ensures the UI remains responsive (animations and input don't freeze) while waiting for the API.
-
-## Styling
-
-The UI is styled using CSS-like syntax within the `StudyeApp` class, defining colors, borders, and layout behaviors for various terminal themes.
- stone colors.
+Long-running tasks like LLM response generation are handled using Textual's `@work` decorator and background threads. This ensures the UI remains responsive while waiting for the API.

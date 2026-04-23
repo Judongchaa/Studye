@@ -1,0 +1,202 @@
+Screen {
+    layers: sidebar main;
+}
+
+ChatMessage {
+    height: auto;
+    width: 100%;
+    margin: 1 0;
+    padding: 1;
+    border: solid red;
+    min-height: 1;
+
+}
+
+ChatMessage Static, ChatMessage Markdown {
+    height: auto;
+    width: 100%;
+}
+
+.message-user {
+    background: $accent;
+}
+
+.message-assistant {
+    background: $boost;
+}
+
+.message-role {
+    text-style: bold;
+    margin-bottom: 1;
+    color: $secondary;
+    width: 100%;
+}
+
+#sidebar {
+    width: 35;
+    height: 100%;
+    dock: left;
+    background: $panel;
+    border-right: tall $primary;
+}
+
+#main {
+    height: 100%;
+}
+
+#chat-container {
+    height: 1fr;
+    overflow-y: scroll;
+    padding: 1;
+}
+
+#input-area {
+    height: auto;
+    padding: 1;
+    background: $boost;
+    border-top: tall $primary;
+}
+
+#attachment-info {
+    color: $warning;
+    margin-bottom: 0;
+    height: 1;
+}
+
+#loading-indicator {
+    height: 1;
+    width: 100%;
+    content-align: center middle;
+    display: none;
+}
+
+#loading-indicator.visible {
+    display: block;
+}
+
+#latest-response-container {
+    height: 60%;
+    border: thick $accent;
+    padding: 0;
+    background: $boost;
+    display: none;
+}
+
+#latest-response-title {
+    text-align: center;
+    text-style: bold;
+    background: $accent;
+    color: $text;
+    width: 100%;
+    height: 1;
+    dock: top;
+}
+
+#latest-response-content {
+    height: auto;
+    padding: 1 2;
+}
+
+#new-item-area {
+    height: auto;
+    padding: 1;
+    background: $panel-lighten-1;
+    display: none;
+}
+
+#new-item-area.visible {
+    display: block;
+}
+
+.title {
+    text-align: center;
+    text-style: bold;
+    padding: 1;
+    background: $primary;
+    color: $text;
+}
+
+#sidebar-buttons {
+    height: auto;
+    layout: vertical;
+}
+
+#sidebar-buttons-row {
+    height: auto;
+    layout: horizontal;
+}
+
+.sidebar-btn {
+    width: 1fr;
+    margin: 0;
+}
+
+#model-select {
+    width: 15;
+}
+
+#chat-input {
+    height: 3;
+    width: 1fr;
+    border: none;
+}
+
+/* Modal Styles */
+FileSelectorModal {
+    align: center middle;
+}
+
+#modal-container {
+    width: 80%;
+    height: 80%;
+    background: $panel;
+    border: thick $primary;
+    padding: 1;
+}
+
+.modal-title {
+    text-align: center;
+    text-style: bold;
+    width: 100%;
+    background: $primary;
+    margin-bottom: 1;
+}
+
+#modal-file-tree {
+    height: 1fr;
+    border: block $surface;
+}
+
+#modal-selected-path {
+    background: $surface;
+    padding: 0 1;
+    margin: 1 0;
+    border: block $primary;
+}
+
+#modal-buttons {
+    height: auto;
+    align: right middle;
+    margin-top: 1;
+}
+
+#modal-buttons Button {
+    margin-left: 1;
+}
+
+PresetSelectorModal {
+    align: center middle;
+}
+
+#preset-list {
+    height: 1fr;
+    border: block $surface;
+}
+
+#preset-list > ListItem {
+    padding: 0 1;
+}
+
+#preset-list > ListItem:hover {
+    background: $accent;
+}
