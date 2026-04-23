@@ -167,6 +167,10 @@ FileSelectorModal {
     border: block $surface;
 }
 
+#session-tree {
+    background: $surface;
+}
+
 #modal-selected-path {
     background: $surface;
     padding: 0 1;

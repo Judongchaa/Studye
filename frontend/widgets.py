@@ -4,7 +4,6 @@ from textual.app import ComposeResult
 from typing import Iterable
 from pathlib import Path
 from rich.text import Text
-import os
 
 from backend.config import SHOW_HIDDEN_FILES, SHOW_MD_FILES
 from backend.session_manager import _is_session_dir
@@ -28,15 +27,12 @@ class FilteredDirectoryTree(DirectoryTree):
         return paths
 
 class SessionDirectoryTree(FilteredDirectoryTree):
-    def render_label(self, node, base_style, control_style):
-        node_label = node.label.copy()
-        node_label.stylize(base_style)
-
-        if node.data.path.is_dir():
-            if _is_session_dir(str(node.data.path)):
-                return Text("💬 ") + node_label
-            return Text("📁 ") + node_label
-        return Text("📄 ") + node_label
+    def render_label(self, node, base_style, style):
+        label = super().render_label(node, base_style, style)
+        if node.data.path.is_dir() and _is_session_dir(str(node.data.path)):
+            # Use the provided 'style' for the new icon to ensure highlighting works
+            return Text("💬 ", style=style) + label[2:]
+        return label
 
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
         paths = super().filter_paths(paths)

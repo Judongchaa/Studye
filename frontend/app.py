@@ -56,6 +56,9 @@ class StudyeApp(App):
     latest_response = reactive("")
     _mode = "session"
 
+    def on_mount(self) -> None:
+        self.query_one("#session-tree").focus()
+
     def watch_latest_response(self, response: str) -> None:
         try:
             container = self.query_one("#latest-response-container")
@@ -76,7 +79,9 @@ class StudyeApp(App):
                 yield Label("STUDYE SESSIONS", classes="title")
                 with Vertical(id="new-item-area"):
                     yield Input(placeholder="New session name...", id="new-item-input")
-                yield SessionDirectoryTree(BASE_DIRECTORY, id="session-tree")
+                yield SessionDirectoryTree(
+                    BASE_DIRECTORY, id="session-tree", classes="directory-tree"
+                )
                 with Vertical(id="sidebar-buttons"):
                     with Horizontal(id="sidebar-buttons-row"):
                         yield Button(

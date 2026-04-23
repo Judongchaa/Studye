@@ -25,7 +25,7 @@ The central controller that manages the UI state and orchestrates communication 
 - **Styling**: Loads styles from `frontend/styles.tcss`.
 
 ### 2. Custom Widgets (`frontend/widgets.py`)
-- **`SessionDirectoryTree`**: A customized directory tree that identifies session directories (marked with 💬) versus regular folders (📁).
+- **`SessionDirectoryTree`**: A customized directory tree that identifies session directories (marked with 💬). It extends `FilteredDirectoryTree` and overrides `render_label` to inject session icons while preserving standard Textual highlighting and selection styles.
 - **`ChatMessage`**: A custom widget for displaying individual messages using Markdown rendering.
 - **`FilteredDirectoryTree`**: Base class for trees that filters hidden files and system markers.
 
