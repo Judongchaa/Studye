@@ -52,9 +52,6 @@ class FilteredDirectoryTree(DirectoryTree):
         if SHOW_HIDDEN_FILES:
             return paths
         filtered = [path for path in paths if not path.name.startswith(".")]
-        with open('debug.log', 'a') as f:
-            f.write(f"Original paths: {[p.name for p in paths]}\n")
-            f.write(f"Filtered hidden: {[p.name for p in filtered]}\n")
         return filtered
     
     def filter_md_files(self, paths: Iterable[Path]) -> Iterable[Path]:
