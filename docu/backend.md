@@ -23,9 +23,11 @@ Handles the filesystem structure for chats.
   - `get_next_filename(session_path)`: Determines the filename for the next interaction (e.g., `0001_interaction.md`).
 
 ### 3. `context_parser.py`
-Responsible for reading session data and converting it into a format suitable for the LLM.
+Responsible for reading session data and converting it into a format suitable for the LLM or for UI previewing.
 - **Parsing**: Reads `.md` files, extracts interaction numbers for sorting, and uses regex to separate "User" and "Assistant" blocks.
-- **Chronology**: Ensures messages are ordered correctly based on the `Interaction: N` metadata.
+- **Preview Support**: Can load a specific `.md` file for previewing in the UI, even if it doesn't follow the standard interaction format.
+- **Chronology**: Ensures messages are ordered correctly based on the `Interaction: N` metadata when loading full sessions.
+- **Metadata Stripping**: Automatically removes `Interaction:` or `Chat:` metadata headers for cleaner display.
 
 ### 4. `attachment_handler.py`
 Handles document processing for context injection.

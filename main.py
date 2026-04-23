@@ -100,7 +100,6 @@ class FileSelectorModal(ModalScreen[Path | None]):
     def handle_cancel(self) -> None:
         self.dismiss(None)
 
-
 class PresetSelectorModal(ModalScreen[str | None]):
     """A modal screen for selecting a preset prompt."""
 
@@ -129,7 +128,6 @@ class PresetSelectorModal(ModalScreen[str | None]):
     @on(Button.Pressed, "#btn-modal-cancel")
     def handle_cancel(self) -> None:
         self.dismiss(None)
-
 
 class SessionDirectoryTree(FilteredDirectoryTree):
     def render_label(self, node, base_style, control_style):
@@ -473,30 +471,61 @@ class StudyeApp(App):
     async def on_directory_tree_file_selected(
         self, event: FilteredDirectoryTree.FileSelected
     ) -> None:
+        """Handle selection of a file in the directory tree."""
         path = str(event.path)
         parent_dir = os.path.dirname(path)
-        if _is_session_dir(parent_dir):
+        
+        if path.endswith(".md"):
+            # If it's a markdown file, we want to preview it.
+            if _is_session_dir(parent_dir):
+                # If it's inside a session, we also select that session.
+                self.select_session(parent_dir, selected_file=path)
+            else:
+                # If it's just a loose .md file, just show the preview.
+                self.update_latest_response_display(parent_dir, selected_file=path)
+                self.notify(f"Previewing: {os.path.basename(path)}")
+        elif _is_session_dir(parent_dir):
+            # For non-md files inside a session, just select the session.
             self.select_session(parent_dir)
 
-    def select_session(self, path: str) -> None:
+    def select_session(self, path: str, selected_file: str = None) -> None:
+        """
+        Activates a session and optionally previews a specific file.
+        
+        Args:
+            path: Path to the session directory.
+            selected_file: Optional path to a specific .md file for immediate preview.
+        """
         if _is_session_dir(path):
-            if self.current_session == path:
-                return  # No need to reload if the same session is selected
-            self.current_session = path
-            self.run_worker(self.load_chat_history(path))
-            self.query_one("#welcome-label").display = False
-            self.notify(f"Session selected: {os.path.basename(path)}")
-            # Show the latest response if any
-            self.update_latest_response_display(path)
+            # Only reload chat history if we are switching sessions
+            if self.current_session != path:
+                self.current_session = path
+                self.run_worker(self.load_chat_history(path))
+                self.query_one("#welcome-label").display = False
+                self.notify(f"Session selected: {os.path.basename(path)}")
+            
+            # Show the preview (either the selected file or the latest interaction)
+            self.update_latest_response_display(path, selected_file=selected_file)
+            if selected_file:
+                self.notify(f"Previewing: {os.path.basename(selected_file)}")
 
-    def update_latest_response_display(self, session_path: str) -> None:
-        messages = load_context(session_path)
+    def update_latest_response_display(self, session_path: str, selected_file: str = None) -> None:
+        """
+        Updates the 'Latest Assistant Response' panel.
+        
+        Args:
+            session_path: Path to the current session or directory.
+            selected_file: If provided, this file's content will be shown instead of the last response.
+        """
+        messages = load_context(session_path, selected_file=selected_file)
         if messages:
+            # Try to find the last assistant message
             assistant_messages = [m for m in messages if m["role"] == "assistant"]
             if assistant_messages:
                 self.latest_response = assistant_messages[-1]["content"]
             else:
-                self.latest_response = ""
+                # If no assistant message, fallback to the last message (e.g. user message or raw md content)
+                self.latest_response = messages[-1]["content"]
         else:
             self.latest_response = ""
 

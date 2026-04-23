@@ -22,7 +22,8 @@ The central controller that manages the UI state and orchestrates communication 
   - `c`: Clear/Refresh Chat
 
 ### 2. `SessionDirectoryTree`
-A customized directory tree that identifies session directories (marked with 💬) versus regular folders (📁).
+A customized directory tree that identifies session directories (marked with 💬) versus regular folders (📁). 
+- **Interaction**: Clicking a session directory loads its chat history. Clicking an individual `.md` file previews its content in the "Latest Response" panel.
 
 ### 3. `ChatMessage`
 A custom widget for displaying individual messages. It uses the `Markdown` widget to render rich text, including code blocks and formatting.
@@ -36,7 +37,7 @@ A custom widget for displaying individual messages. It uses the `Markdown` widge
 The app uses Textual's **Reactive** properties to manage dynamic UI updates:
 - `current_session`: Tracks the active path.
 - `attached_file`: Stores the path of the file staged for the next message.
-- `latest_response`: Holds the text of the most recent assistant answer, which is also displayed in a dedicated "Latest Response" container.
+- `latest_response`: Holds the text of the most recent assistant answer or the content of a selected `.md` file, which is displayed in a dedicated "Latest Response" container.
 
 ## Concurrency
 

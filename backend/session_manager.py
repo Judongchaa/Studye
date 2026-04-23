@@ -15,14 +15,6 @@ def _is_session_dir(path):
     marker_file = os.path.join(path, ".session")
     if os.path.isfile(marker_file):
         return True
-    # legacy support: directories with interaction history are sessions
-    try:
-        for f in os.listdir(path):
-            if f.endswith("_interaction.md"):
-                return True
-    except Exception:
-        pass
-    return False
 
 
 def list_sessions():

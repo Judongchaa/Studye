@@ -13,7 +13,8 @@ Studye is a TUI (Terminal User Interface) application built with Python and Text
 - **Document Context**: Attach `.txt`, `.py`, `.pdf`, or `.docx` files to your queries.
 - **Preset Prompts**: Quickly apply complex pedagogical instructions.
 - **Markdown-First**: All interactions are stored as standard Markdown files.
-- **Dual Display**: View the full chat history or focus on the latest response.
+- **Smart Preview**: Click on any `.md` file in the sidebar to instantly preview its content in the focus panel.
+- **Dual Display**: View the full chat history or focus on the latest response/selected file.
 
 ## Installation
 
