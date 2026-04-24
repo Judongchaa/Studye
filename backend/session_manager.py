@@ -1,5 +1,6 @@
 import os
 
+from functools import lru_cache
 from .config import BASE_DIRECTORY
 from .context_parser import _extract_interaction_number
 
@@ -9,12 +10,14 @@ def _ensure_base_directory():
         os.makedirs(BASE_DIRECTORY)
 
 
+@lru_cache(maxsize=1024)
 def _is_session_dir(path):
     if not path or not os.path.isdir(path):
         return False
     marker_file = os.path.join(path, ".session")
     if os.path.isfile(marker_file):
         return True
+    return False
 
 
 def list_sessions():
@@ -45,9 +48,21 @@ def create_session(name):
 
 
 def get_next_filename(session_path):
-    md_files = [f for f in os.listdir(session_path) if f.endswith('.md')]
+    try:
+        md_files = [f for f in os.listdir(session_path) if f.endswith('.md')]
+    except OSError:
+        return "0001_interaction.md"
+        
     numbers = []
     for file in md_files:
+        # Try to get number from filename first (fast)
+        if "_" in file:
+            prefix = file.split("_")[0]
+            if prefix.isdigit():
+                numbers.append(int(prefix))
+                continue
+        
+        # Fallback to reading file content (slow)
         full_path = os.path.join(session_path, file)
         number = _extract_interaction_number(full_path)
         if number is not None:

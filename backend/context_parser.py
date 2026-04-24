@@ -35,21 +35,25 @@ def load_context(session_path, selected_file=None):
     """
     if selected_file == None:
         # Load all .md files in the session directory for chat history
-        files = [f for f in os.listdir(session_path) if f.endswith(".md")]
-        numbered_files = []
+        try:
+            files = [f for f in os.listdir(session_path) if f.endswith(".md")]
+        except OSError:
+            return []
+            
+        file_data = []
         for file in files:
             full_path = os.path.join(session_path, file)
+            # Optimization: Only read the beginning of the file for sorting
             number = _extract_interaction_number(full_path)
-            # Store with number for sorting; files without numbers go to the end
-            numbered_files.append(
+            file_data.append(
                 (number if number is not None else float("inf"), full_path)
             )
 
         # Ensure chronological order based on the 'Interaction: N' metadata
-        numbered_files.sort(key=lambda x: (x[0], x[1]))
+        file_data.sort(key=lambda x: (x[0], x[1]))
 
         messages = []
-        for _, file_path in numbered_files:
+        for _, file_path in file_data:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
@@ -66,12 +70,10 @@ def load_context(session_path, selected_file=None):
                 content_body = content
 
             # Use regex to split sections while keeping the role headers.
-            # This prevents internal '### Header' markers from breaking the content.
             sections = re.split(r"(###\s+User\n|###\s+Assistant\n)", content_body)
             
             for i in range(1, len(sections), 2):
                 header = sections[i].strip()
-                # The content is in the next split element
                 text = sections[i+1].strip() if i+1 < len(sections) else ""
                 
                 role = "user" if "User" in header else "assistant"

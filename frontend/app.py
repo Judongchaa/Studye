@@ -139,50 +139,67 @@ class StudyeApp(App):
     async def on_directory_tree_directory_selected(
         self, event: FilteredDirectoryTree.DirectorySelected
     ) -> None:
-        self.select_session(str(event.path))
+        is_session = getattr(event.node.data, "is_session", False)
+        if is_session:
+            self.select_session(str(event.path))
 
     async def on_directory_tree_file_selected(
         self, event: FilteredDirectoryTree.FileSelected
     ) -> None:
         path = str(event.path)
-        parent_dir = os.path.dirname(path)
+        # Access the node to get the cached session status
+        parent_node = event.node.parent
+        is_session = False
+        if parent_node and parent_node.data:
+            is_session = getattr(parent_node.data, "is_session", False)
         
         if path.endswith(".md"):
-            if _is_session_dir(parent_dir):
-                self.select_session(parent_dir, selected_file=path)
+            if is_session:
+                self.select_session(os.path.dirname(path), selected_file=path)
             else:
-                self.update_latest_response_display(parent_dir, selected_file=path)
+                self.update_latest_response_display(os.path.dirname(path), selected_file=path)
                 self.notify(f"Previewing: {os.path.basename(path)}")
-        elif _is_session_dir(parent_dir):
-            self.select_session(parent_dir)
+        elif is_session:
+            self.select_session(os.path.dirname(path))
 
     def select_session(self, path: str, selected_file: str = None) -> None:
-        if _is_session_dir(path):
-            if self.current_session != path:
-                self.current_session = path
-                self.run_worker(self.load_chat_history(path))
-                self.query_one("#welcome-label").display = False
-                self.notify(f"Session selected: {os.path.basename(path)}")
-            
-            self.update_latest_response_display(path, selected_file=selected_file)
-            if selected_file:
-                self.notify(f"Previewing: {os.path.basename(selected_file)}")
+        if self.current_session != path:
+            self.current_session = path
+            self.load_chat_history(path)
+            self.query_one("#welcome-label").display = False
+            self.notify(f"Session selected: {os.path.basename(path)}")
+        
+        self.update_latest_response_display(path, selected_file=selected_file)
+        if selected_file:
+            self.notify(f"Previewing: {os.path.basename(selected_file)}")
 
+    @work(thread=True)
     def update_latest_response_display(self, session_path: str, selected_file: str = None) -> None:
         messages = load_context(session_path, selected_file=selected_file)
         if messages:
             assistant_messages = [m for m in messages if m["role"] == "assistant"]
             if assistant_messages:
-                self.latest_response = assistant_messages[-1]["content"]
+                content = assistant_messages[-1]["content"]
             else:
-                self.latest_response = messages[-1]["content"]
+                content = messages[-1]["content"]
         else:
-            self.latest_response = ""
+            content = ""
+        
+        self.app.call_from_thread(self._set_latest_response, content)
 
+    def _set_latest_response(self, content: str) -> None:
+        self.latest_response = content
+
+    @work(exclusive=True)
     async def load_chat_history(self, session_path: str) -> None:
+        import asyncio
+        loop = asyncio.get_running_loop()
+        # Run blocking load_context in a thread
+        messages = await loop.run_in_executor(None, load_context, session_path)
+        
+        # UI updates must be on the main thread
         chat_container = self.query_one("#chat-container")
         await chat_container.query(ChatMessage).remove()
-        messages = load_context(session_path)
         widgets_to_mount = [ChatMessage(msg["role"], msg["content"]) for msg in messages]
         if widgets_to_mount:
             await chat_container.mount_all(widgets_to_mount)

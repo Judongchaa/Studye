@@ -25,9 +25,9 @@ The central controller that manages the UI state and orchestrates communication 
 - **Styling**: Loads styles from `frontend/styles.tcss`.
 
 ### 2. Custom Widgets (`frontend/widgets.py`)
-- **`SessionDirectoryTree`**: A customized directory tree that identifies session directories (marked with 💬). It extends `FilteredDirectoryTree` and overrides `render_label` to inject session icons while preserving standard Textual highlighting and selection styles.
-- **`ChatMessage`**: A custom widget for displaying individual messages using Markdown rendering.
-- **`FilteredDirectoryTree`**: Base class for trees that filters hidden files and system markers.
+- **`SessionDirectoryTree`**: A customized directory tree that identifies session directories (marked with 💬). It extends `FilteredDirectoryTree` and implements node-level caching for session status to ensure high-performance rendering during scrolling.
+- **`ChatMessage`**: An optimized widget for displaying individual messages. It uses `Static` with `RichMarkdown` for faster rendering compared to the standard `Markdown` widget.
+- **`FilteredDirectoryTree`**: Base class for trees that filters hidden files and system markers using a single-pass filtering algorithm for better efficiency.
 
 ### 3. Modals (`frontend/modals.py`)
 - **`FileSelectorModal`**: A system-wide file picker for selecting attachments.
@@ -42,4 +42,9 @@ The app uses Textual's **Reactive** properties to manage dynamic UI updates:
 
 ## Concurrency
 
-Long-running tasks like LLM response generation are handled using Textual's `@work` decorator and background threads. This ensures the UI remains responsive while waiting for the API.
+The application prioritizes a responsive UI by offloading all potentially blocking operations to background workers using Textual's `@work` decorator:
+- **Chat Loading**: `load_chat_history` runs on the main thread but offloads the blocking filesystem I/O to a thread pool, ensuring the TUI never freezes during session selection.
+- **Response Preview**: `update_latest_response_display` runs in a dedicated thread to load and parse markdown files.
+- **LLM Generation**: Response generation is handled in an exclusive background thread.
+
+This multi-threaded approach ensures smooth interaction even on hardware with power-saving constraints.

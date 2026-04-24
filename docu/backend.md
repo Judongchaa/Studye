@@ -17,14 +17,16 @@ Manages application-wide settings and environment variables.
 ### 2. `session_manager.py`
 Handles the filesystem structure for chats.
 - **Session Structure**: A session is a directory containing a `.session` marker file and multiple `.md` files (interactions).
+- **Performance**: Uses `lru_cache` for session directory validation to speed up directory tree rendering.
 - **Functions**:
   - `list_sessions()`: Recursively finds all session directories.
   - `create_session(name)`: Creates a new session directory with the required marker.
-  - `get_next_filename(session_path)`: Determines the filename for the next interaction (e.g., `0001_interaction.md`).
+  - `get_next_filename(session_path)`: Determines the filename for the next interaction (e.g., `0001_interaction.md`). Optimized to extract numbers from filenames first to avoid unnecessary disk I/O.
 
 ### 3. `context_parser.py`
 Responsible for reading session data and converting it into a format suitable for the LLM or for UI previewing.
-- **Parsing**: Reads `.md` files, extracts interaction numbers for sorting, and uses regex to separate "User" and "Assistant" blocks.
+- **Parsing**: Reads `.md` files and uses regex to separate "User" and "Assistant" blocks.
+- **Optimization**: Employs a two-stage loading process; during sorting, it only reads the metadata headers of files to minimize I/O overhead.
 - **Preview Support**: Can load a specific `.md` file for previewing in the UI, even if it doesn't follow the standard interaction format.
 - **Chronology**: Ensures messages are ordered correctly based on the `Interaction: N` metadata when loading full sessions.
 - **Metadata Stripping**: Automatically removes `Interaction:` or `Chat:` metadata headers for cleaner display.
