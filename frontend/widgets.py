@@ -68,5 +68,5 @@ class ChatMessage(Vertical):
         self.content = content
 
     def compose(self) -> ComposeResult:
-        yield Static(f"[{self.role.upper()}]", classes="message-role")
+        yield Static(f"{self.role.upper()}", classes="message-role")
         yield Static(RichMarkdown(self.content))

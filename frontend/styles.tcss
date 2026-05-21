@@ -1,47 +1,133 @@
+/* Dracula Palette */
+$bg: #282a36;
+$accent: #6272a4;
+$text: #f8f8f2;
+$text-muted: #6272a4;
+$selection-bg: #44475a;
+$focus-green: #50fa7b;
+$focus-pink: #ff79c6;
+
+* {
+    scrollbar-size: 1 1;
+    scrollbar-color: $selection-bg;
+    scrollbar-color-hover: $accent;
+    scrollbar-color-active: $focus-green;
+    scrollbar-background: transparent;
+}
+
 Screen {
+    background: $bg;
+    color: $text;
     layers: sidebar main;
 }
 
-ChatMessage {
-    height: auto;
-    width: 100%;
-    margin: 1 0;
-    padding: 1;
-    border: solid red;
-    min-height: 1;
-
-}
-
-ChatMessage Static, ChatMessage Markdown {
-    height: auto;
-    width: 100%;
-}
-
-.message-user {
-    background: $accent;
-}
-
-.message-assistant {
-    background: $boost;
-}
-
-.message-role {
+Header {
+    background: transparent;
+    color: $accent;
     text-style: bold;
-    margin-bottom: 1;
-    color: $secondary;
-    width: 100%;
+}
+
+Footer {
+    background: transparent;
+    color: $accent;
 }
 
 #sidebar {
     width: 35;
     height: 100%;
     dock: left;
-    background: $panel;
-    border-right: tall $primary;
+    background: transparent;
+    border: none;
+    border-right: panel $selection-bg;
 }
 
 #main {
     height: 100%;
+}
+
+/* Chat History Styles */
+ChatMessage {
+    height: auto;
+    width: 100%;
+    margin: 0;
+    padding: 1 2;
+    border: none;
+}
+
+.message-user {
+    background: transparent;
+}
+
+.message-assistant {
+    background: transparent;
+}
+
+.message-role {
+    text-style: bold;
+    margin-bottom: 0;
+    color: $focus-pink;
+    width: 100%;
+    opacity: 0.7;
+}
+
+.message-user .message-role {
+    color: $accent;
+}
+
+.message-assistant .message-role {
+    color: $focus-pink;
+}
+
+/* Directory Tree & Lists */
+DirectoryTree {
+    background: transparent;
+    border: none;
+    padding: 0 1;
+}
+
+DirectoryTree > .directory-tree--extension { display: none; }
+DirectoryTree > .directory-tree--file { display: none; }
+DirectoryTree > .directory-tree--folder { color: $accent; }
+
+DirectoryTree:focus {
+    border: none;
+}
+
+/* Focus styles for Tree and List */
+Tree > .tree--cursor {
+    background: transparent !important;
+}
+
+Tree > .tree--cursor > .tree--label {
+    color: $focus-green !important;
+    text-style: bold;
+}
+
+ListView {
+    background: transparent;
+}
+
+ListView > ListItem {
+    height: 1;
+    padding: 0 1;
+    background: transparent;
+}
+
+ListView > ListItem.--highlight {
+    background: transparent !important;
+}
+
+ListView > ListItem.--highlight Label {
+    color: $focus-green !important;
+    text-style: bold;
+}
+
+/* Chat Input Area */
+#input-area {
+    height: auto;
+    padding: 0 1;
+    background: transparent;
+    border-top: panel $selection-bg;
 }
 
 #chat-container {
@@ -50,80 +136,57 @@ ChatMessage Static, ChatMessage Markdown {
     padding: 1;
 }
 
-#input-area {
-    height: auto;
-    padding: 1;
-    background: $boost;
-    border-top: tall $primary;
-}
-
-#attachment-info {
-    color: $warning;
-    margin-bottom: 0;
-    height: 1;
-}
-
-#loading-indicator {
-    height: 1;
-    width: 100%;
-    content-align: center middle;
-    display: none;
-}
-
-#loading-indicator.visible {
-    display: block;
-}
-
-#latest-response-container {
-    height: 60%;
-    border: thick $accent;
-    padding: 0;
-    background: $boost;
-    display: none;
-}
-
-#latest-response-title {
-    text-align: center;
-    text-style: bold;
-    background: $accent;
+#chat-input {
+    background: transparent;
     color: $text;
-    width: 100%;
-    height: 1;
-    dock: top;
+    border: none;
+    padding: 0 1;
 }
 
-#latest-response-content {
-    height: auto;
-    padding: 1 2;
+#chat-input:focus {
+    border: none;
 }
 
-#new-item-area {
-    height: auto;
-    padding: 1;
-    background: $panel-lighten-1;
-    display: none;
-}
-
-#new-item-area.visible {
-    display: block;
-}
-
-.title {
-    text-align: center;
-    text-style: bold;
-    padding: 1;
-    background: $primary;
+Input {
+    background: transparent;
     color: $text;
+    border: none;
 }
 
-#sidebar-buttons {
-    height: auto;
-    layout: vertical;
+Input:focus {
+    border: none;
 }
 
-#sidebar-buttons-row {
-    height: auto;
-    layout: horizontal;
+Select {
+    background: $selection-bg;
+    color: $text;
+    border: none;
+}
+
+/* Buttons */
+Button {
+    background: transparent;
+    color: $accent;
+    border: none;
+    min-width: 4;
+    margin: 0;
+    text-style: none;
+    height: 1;
+}
+
+Button:focus {
+    background: transparent;
+    color: $focus-green;
+    text-style: bold;
+}
+
+Button.-primary { color: $accent; }
+Button.-success { color: $focus-green; }
+Button.-error { color: $focus-pink; }
+Button.-warning { color: $focus-pink; }
+
+Button:hover {
+    background: $selection-bg;
 }
 
 .sidebar-btn {
@@ -131,26 +194,53 @@ ChatMessage Static, ChatMessage Markdown {
     margin: 0;
 }
 
-#model-select {
-    width: 15;
+#sidebar-buttons-row {
+    height: auto;
+    layout: horizontal;
 }
 
-#chat-input {
-    height: 3;
-    width: 1fr;
+#sidebar-buttons {
+    height: auto;
+    layout: vertical;
+}
+
+/* Latest Response Overlay */
+#latest-response-container {
+    height: 50%;
     border: none;
+    border-bottom: panel $selection-bg;
+    padding: 0;
+    background: rgba(40, 42, 54, 0.9);
+    display: none;
 }
 
-/* Modal Styles */
-FileSelectorModal {
+#latest-response-title {
+    text-align: center;
+    text-style: bold;
+    background: transparent;
+    color: $focus-pink;
+    width: 100%;
+    height: 1;
+    dock: top;
+    opacity: 0.8;
+}
+
+#latest-response-content {
+    height: auto;
+    padding: 1 2;
+}
+
+/* Modals */
+ModalScreen {
+    background: rgba(0, 0, 0, 0.7);
     align: center middle;
 }
 
 #modal-container {
-    width: 80%;
-    height: 80%;
-    background: $panel;
-    border: thick $primary;
+    width: 70%;
+    height: 70%;
+    background: $bg;
+    border: panel $accent;
     padding: 1;
 }
 
@@ -158,24 +248,19 @@ FileSelectorModal {
     text-align: center;
     text-style: bold;
     width: 100%;
-    background: $primary;
+    color: $accent;
     margin-bottom: 1;
 }
 
 #modal-file-tree {
     height: 1fr;
-    border: block $surface;
-}
-
-#session-tree {
-    background: $surface;
+    border: none;
 }
 
 #modal-selected-path {
-    background: $surface;
+    color: $text-muted;
     padding: 0 1;
     margin: 1 0;
-    border: block $primary;
 }
 
 #modal-buttons {
@@ -188,19 +273,52 @@ FileSelectorModal {
     margin-left: 1;
 }
 
-PresetSelectorModal {
-    align: center middle;
-}
-
-#preset-list {
-    height: 1fr;
-    border: block $surface;
-}
-
-#preset-list > ListItem {
+/* New Item Area */
+#new-item-area {
+    height: auto;
     padding: 0 1;
+    background: transparent;
+    display: none;
 }
 
-#preset-list > ListItem:hover {
-    background: $accent;
+#new-item-area.visible {
+    display: block;
+}
+
+.title {
+    text-align: left;
+    text-style: bold;
+    padding: 1 2;
+    background: transparent;
+    color: $accent;
+}
+
+#attachment-info {
+    color: $focus-pink;
+    margin-bottom: 0;
+    height: 1;
+    padding-left: 1;
+}
+
+#loading-indicator {
+    height: 1;
+    width: 100%;
+    content-align: center middle;
+    display: none;
+    color: $focus-green;
+}
+
+#loading-indicator.visible {
+    display: block;
+}
+
+#model-select {
+    width: 20;
+}
+
+#welcome-label {
+    text-align: center;
+    width: 100%;
+    margin-top: 5;
+    color: $text-muted;
 }
