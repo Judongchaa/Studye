@@ -48,16 +48,20 @@ class StudyeApp(App):
         ("t", "temp_chat", "Temp Chat"),
         ("a", "attach_file", "Attach File"),
         ("p", "select_preset", "Presets"),
+        ("h", "toggle_md_only", "Toggle MD Only"),
     ]
 
     # --- Reactive States ---
     current_session = reactive(None)
+    current_preview_file = reactive(None)
     attached_file = reactive(None)
     latest_response = reactive("")
     _mode = "session"
 
     def on_mount(self) -> None:
-        self.query_one("#session-tree").focus()
+        tree = self.query_one("#session-tree")
+        tree.show_root = False
+        tree.focus()
 
     def watch_latest_response(self, response: str) -> None:
         try:
@@ -154,12 +158,14 @@ class StudyeApp(App):
             is_session = getattr(parent_node.data, "is_session", False)
         
         if path.endswith(".md"):
+            self.current_preview_file = path
             if is_session:
                 self.select_session(os.path.dirname(path), selected_file=path)
             else:
                 self.update_latest_response_display(os.path.dirname(path), selected_file=path)
                 self.notify(f"Previewing: {os.path.basename(path)}")
         elif is_session:
+            self.current_preview_file = None
             self.select_session(os.path.dirname(path))
 
     def select_session(self, path: str, selected_file: str = None) -> None:
@@ -376,9 +382,22 @@ class StudyeApp(App):
     def hide_loading(self) -> None:
         self.query_one("#loading-indicator").remove_class("visible")
 
+    def action_toggle_md_only(self) -> None:
+        tree = self.query_one("#session-tree")
+        tree.only_md_files = not getattr(tree, "only_md_files", False)
+        tree.reload()
+        state = "ON" if tree.only_md_files else "OFF"
+        self.notify(f"MD only filter: {state}")
+
     @work
     async def action_attach_file(self) -> None:
-        file_path = await self.push_screen_wait(FileSelectorModal())
+        root_dir = None
+        if self.current_preview_file:
+            root_dir = os.path.dirname(self.current_preview_file)
+        elif self.current_session:
+            root_dir = self.current_session
+
+        file_path = await self.push_screen_wait(FileSelectorModal(root_dir=root_dir))
         if file_path:
             self.attached_file = file_path
             self.query_one("#attachment-info").update(f"Attached: {file_path.name}")

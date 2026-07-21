@@ -14,11 +14,17 @@ class FileSelectorModal(ModalScreen[Path | None]):
 
     _selected_path: Path | None = None
 
+    def __init__(self, root_dir: str = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if root_dir and os.path.exists(root_dir):
+            self.root_dir = root_dir
+        else:
+            self.root_dir = os.path.expanduser(ATTACHMENT_ROOT_DIRECTORY)
+
     def compose(self) -> ComposeResult:
         with Vertical(id="modal-container"):
             yield Label("SELECT FILE TO ATTACH", classes="modal-title")
-            root_dir = os.path.expanduser(ATTACHMENT_ROOT_DIRECTORY)
-            yield FilteredDirectoryTree(root_dir, id="modal-file-tree")
+            yield FilteredDirectoryTree(self.root_dir, id="modal-file-tree")
             yield Label("No file selected", id="modal-selected-path")
             with Horizontal(id="modal-buttons"):
                 yield Button("Select", variant="success", id="btn-modal-select")

@@ -9,11 +9,14 @@ from backend.config import SHOW_HIDDEN_FILES, SHOW_MD_FILES
 from backend.session_manager import _is_session_dir
 
 class FilteredDirectoryTree(DirectoryTree):
+    only_md_files: bool = False
+
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
         return [
             path for path in paths
             if (SHOW_HIDDEN_FILES or not path.name.startswith(".")) and
-               (SHOW_MD_FILES or not path.name.endswith(".md"))
+               (SHOW_MD_FILES or not path.name.endswith(".md")) and
+               (not self.only_md_files or path.is_dir() or path.name.endswith(".md"))
         ]
 
 from rich.markdown import Markdown as RichMarkdown
@@ -56,6 +59,7 @@ class SessionDirectoryTree(FilteredDirectoryTree):
             path for path in paths
             if (SHOW_HIDDEN_FILES or not path.name.startswith(".")) and
                (SHOW_MD_FILES or not path.name.endswith(".md")) and
+               (not self.only_md_files or path.is_dir() or path.name.endswith(".md")) and
                path.name != ".session"
         ]
 
